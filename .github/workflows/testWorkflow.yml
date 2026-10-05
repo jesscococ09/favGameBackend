@@ -1,4 +1,4 @@
-name: Test OIDC Token
+name: Test OIDC Token 2
 
 on:
   workflow_dispatch:
