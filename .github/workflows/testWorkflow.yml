@@ -13,8 +13,6 @@ jobs:
     steps:
       - name: Request OIDC token
         id: get_token
-        uses: actions/oidc-token@v1
-
-      - name: Print OIDC token
         run: |
-          echo "Token: ${{ steps.get_token.outputs.oidc_token }}"
+          echo "OIDC token:"
+          echo "${ACTIONS_ID_TOKEN_REQUEST_TOKEN}"
