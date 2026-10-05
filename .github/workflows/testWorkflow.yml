@@ -1,0 +1,20 @@
+name: Test OIDC Token
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Request OIDC token
+        id: get_token
+        uses: actions/oidc-token@v1
+
+      - name: Print OIDC token
+        run: |
+          echo "Token: ${{ steps.get_token.outputs.oidc_token }}"
