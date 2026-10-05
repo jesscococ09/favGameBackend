@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Request OIDC token
-        id: get_token
         run: |
           echo "OIDC token:"
-          echo "${ACTIONS_ID_TOKEN_REQUEST_TOKEN}"
+          curl -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+               "$ACTIONS_ID_TOKEN_REQUEST_URL"
