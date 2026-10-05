@@ -12,7 +12,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Request OIDC token
+        id: get_token
         run: |
           echo "OIDC token:"
-          curl -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
-               "$ACTIONS_ID_TOKEN_REQUEST_URL"
+          TOKEN=$(curl -s -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+                     "$ACTIONS_ID_TOKEN_REQUEST_URL" | jq -r '.value')
+          echo "RAW_TOKEN=$TOKEN" >> $GITHUB_ENV
+
+      - name: Print raw token
+        run: |
+          echo "$RAW_TOKEN"
