@@ -1,5 +1,6 @@
 package com.example.demo.model
 
+import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
@@ -14,6 +15,6 @@ data class User(
     val id: String?=null,
     val githubId: String,
     val displayName: String,
-    val iconUrl: String?,
+    val iconUrl: String?=null,
     val isAdmin: Boolean= false
 )
