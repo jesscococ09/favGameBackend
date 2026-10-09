@@ -96,6 +96,39 @@ class APIControllerTest {
     }
 
     @Test
+    fun `PUT replaceGame replaces all fields`() {
+        val apiService = mock(APIService::class.java)
+        val controller = APIController(apiService)
+        val auth = testAuth()
+
+        val body = mapOf(
+            "gameName" to "UpdatedName",
+            "thumbnail" to "newThumb.png",
+            "gameDescription" to "newDesc",
+            "platform" to "PC",
+            "genre" to "Adventure",
+            "rating" to 10,
+            "comment" to "Amazing!"
+        )
+
+        val updated = API("1", "gh123", "UpdatedName", "newThumb.png", "newDesc", "PC", "Adventure", 10, "Amazing!")
+
+        `when`(apiService.replaceGame("gh123", "1", body)).thenReturn(updated)
+
+        val result = controller.replaceGame(auth, "1", body)
+
+        assertEquals("UpdatedName", result.gameName)
+        assertEquals("newThumb.png", result.thumbnail)
+        assertEquals("newDesc", result.gameDescription)
+        assertEquals("PC", result.platform)
+        assertEquals("Adventure", result.genre)
+        assertEquals(10, result.rating)
+        assertEquals("Amazing!", result.comment)
+
+        verify(apiService).replaceGame("gh123", "1", body)
+    }
+
+    @Test
     fun `PATCH updateGame updates rating and comment`() {
         val apiService = mock(APIService::class.java)
         val controller = APIController(apiService)
