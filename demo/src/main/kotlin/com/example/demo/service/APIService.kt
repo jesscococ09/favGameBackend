@@ -20,7 +20,7 @@ class APIService(private val apiRepository: APIRepository) {
         }
         if(sort!= null){
             games= when(sort){
-                "alphabetical"->games.sortedBy { it.gameDescription }
+                "alphabetical"->games.sortedBy { it.gameName }
                 "rating"-> games.sortedByDescending { it.rating }
                 "genre"->games.sortedBy { it.genre }
                 else -> games
@@ -32,7 +32,7 @@ class APIService(private val apiRepository: APIRepository) {
     }
     fun searchMyGames(githubId: String,query: String): List<API>{
         return apiRepository.findByGithubId(githubId).filter {
-            it.gameDescription.contains(query, ignoreCase = true)
+            it.gameName.contains(query, ignoreCase = true)
         }
     }
     fun getMyGame(githubId: String,id: String): API{
@@ -42,6 +42,7 @@ class APIService(private val apiRepository: APIRepository) {
     }
     fun addGame(githubId: String,body: Map<String, Any>): API{
         val id= UUID.randomUUID().toString()
+        val gameName = body["gameName"] as? String ?: ""
         val thumbnail= body["thumbnail"] as? String ?: ""
         val gameDescription= body["gameDescription"] as? String ?: ""
         val platform= body["platform"] as? String ?: ""
@@ -51,6 +52,7 @@ class APIService(private val apiRepository: APIRepository) {
         val game= API(
             id= id,
             githubId= githubId,
+            gameName = gameName,
             thumbnail= thumbnail,
             gameDescription= gameDescription,
             platform=platform,

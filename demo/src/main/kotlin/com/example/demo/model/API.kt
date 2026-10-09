@@ -7,8 +7,8 @@ import jakarta.persistence.Table
 API {
     String id PK
     string githubId
-    string thumbnail
     string gameName
+    string thumbnail
     string gameDescription
     string platform
     string genre
@@ -23,6 +23,7 @@ data class API(
     @Id
     val id: String,
     val githubId: String,
+    val gameName: String,
     val thumbnail:String,
     val gameDescription: String,
     val platform: String,

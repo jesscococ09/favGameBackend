@@ -15,8 +15,8 @@ class APIServiceTest {
     @Test
     fun listMyGames_noSort_noGenre() {
         val games = listOf(
-            API("1", "gh123", "t1", "desc1", "p1", "RPG", 5, "c1"),
-            API("2", "gh123", "t2", "desc2", "p2", "Action", 7, "c2")
+            API("1", "gh123", "Game1", "t1", "desc1", "p1", "RPG", 5, "c1"),
+            API("2", "gh123", "Game2", "t2", "desc2", "p2", "Action", 7, "c2")
         )
         `when`(apiRepo.findByGithubId("gh123")).thenReturn(games)
         val result = service.listMyGames("gh123", 0, 20, null, null)
@@ -26,8 +26,8 @@ class APIServiceTest {
     @Test
     fun listMyGames_genreFilter() {
         val games = listOf(
-            API("1", "gh123", "t1", "desc1", "p1", "RPG", 5, "c1"),
-            API("2", "gh123", "t2", "desc2", "p2", "Action", 7, "c2")
+            API("1", "gh123", "Game1", "t1", "desc1", "p1", "RPG", 5, "c1"),
+            API("2", "gh123", "Game2", "t2", "desc2", "p2", "Action", 7, "c2")
         )
         `when`(apiRepo.findByGithubId("gh123")).thenReturn(games)
         val result = service.listMyGames("gh123", 0, 20, null, "RPG")
@@ -37,19 +37,19 @@ class APIServiceTest {
     @Test
     fun listMyGames_sortAlphabetical() {
         val games = listOf(
-            API("1", "gh123", "t1", "B Game", "p1", "RPG", 5, "c1"),
-            API("2", "gh123", "t2", "A Game", "p2", "Action", 7, "c2")
+            API("1", "gh123", "B Game", "t1", "desc1", "p1", "RPG", 5, "c1"),
+            API("2", "gh123", "A Game", "t2", "desc2", "p2", "Action", 7, "c2")
         )
         `when`(apiRepo.findByGithubId("gh123")).thenReturn(games)
         val result = service.listMyGames("gh123", 0, 20, "alphabetical", null)
-        assertEquals("A Game", result[0].gameDescription)
+        assertEquals("A Game", result[0].gameName)
     }
 
     @Test
     fun listMyGames_sortRating() {
         val games = listOf(
-            API("1", "gh123", "t1", "desc1", "p1", "RPG", 5, "c1"),
-            API("2", "gh123", "t2", "desc2", "p2", "Action", 9, "c2")
+            API("1", "gh123", "Game1", "t1", "desc1", "p1", "RPG", 5, "c1"),
+            API("2", "gh123", "Game2", "t2", "desc2", "p2", "Action", 9, "c2")
         )
         `when`(apiRepo.findByGithubId("gh123")).thenReturn(games)
         val result = service.listMyGames("gh123", 0, 20, "rating", null)
@@ -59,8 +59,8 @@ class APIServiceTest {
     @Test
     fun listMyGames_sortGenre() {
         val games = listOf(
-            API("1", "gh123", "t1", "desc1", "p1", "RPG", 5, "c1"),
-            API("2", "gh123", "t2", "desc2", "p2", "Action", 7, "c2")
+            API("1", "gh123", "Game1", "t1", "desc1", "p1", "RPG", 5, "c1"),
+            API("2", "gh123", "Game2", "t2", "desc2", "p2", "Action", 7, "c2")
         )
         `when`(apiRepo.findByGithubId("gh123")).thenReturn(games)
         val result = service.listMyGames("gh123", 0, 20, "genre", null)
@@ -70,8 +70,8 @@ class APIServiceTest {
     @Test
     fun listMyGames_unknownSort() {
         val games = listOf(
-            API("1", "gh123", "t1", "desc1", "p1", "RPG", 5, "c1"),
-            API("2", "gh123", "t2", "desc2", "p2", "Action", 7, "c2")
+            API("1", "gh123", "Game1", "t1", "desc1", "p1", "RPG", 5, "c1"),
+            API("2", "gh123", "Game2", "t2", "desc2", "p2", "Action", 7, "c2")
         )
         `when`(apiRepo.findByGithubId("gh123")).thenReturn(games)
         val result = service.listMyGames("gh123", 0, 20, "unknown", null)
@@ -80,7 +80,9 @@ class APIServiceTest {
 
     @Test
     fun listMyGames_paginationOutOfRange() {
-        val games = listOf(API("1", "gh123", "t1", "desc1", "p1", "RPG", 5, "c1"))
+        val games = listOf(
+            API("1", "gh123", "Game1", "t1", "desc1", "p1", "RPG", 5, "c1")
+        )
         `when`(apiRepo.findByGithubId("gh123")).thenReturn(games)
         val result = service.listMyGames("gh123", 10, 20, null, null)
         assertTrue(result.isEmpty())
@@ -89,8 +91,8 @@ class APIServiceTest {
     @Test
     fun searchMyGames_match() {
         val games = listOf(
-            API("1", "gh123", "t1", "Zelda adventure", "p1", "RPG", 5, "c1"),
-            API("2", "gh123", "t2", "Mario fun", "p2", "Action", 7, "c2")
+            API("1", "gh123", "Zelda Adventure", "t1", "desc1", "p1", "RPG", 5, "c1"),
+            API("2", "gh123", "Mario Fun", "t2", "desc2", "p2", "Action", 7, "c2")
         )
         `when`(apiRepo.findByGithubId("gh123")).thenReturn(games)
         val result = service.searchMyGames("gh123", "zelda")
@@ -99,7 +101,7 @@ class APIServiceTest {
 
     @Test
     fun getMyGame_owned() {
-        val game = API("1", "gh123", "t", "d", "p", "g", 5, "c")
+        val game = API("1", "gh123", "Game1", "t", "d", "p", "g", 5, "c")
         `when`(apiRepo.findById("1")).thenReturn(Optional.of(game))
         val result = service.getMyGame("gh123", "1")
         assertEquals("1", result.id)
@@ -107,7 +109,7 @@ class APIServiceTest {
 
     @Test
     fun getMyGame_notOwned() {
-        val game = API("1", "other", "t", "d", "p", "g", 5, "c")
+        val game = API("1", "other", "Game1", "t", "d", "p", "g", 5, "c")
         `when`(apiRepo.findById("1")).thenReturn(Optional.of(game))
         assertThrows(IllegalArgumentException::class.java) {
             service.getMyGame("gh123", "1")
@@ -117,6 +119,7 @@ class APIServiceTest {
     @Test
     fun addGame_fullFields() {
         val body = mapOf(
+            "gameName" to "My Game",
             "thumbnail" to "t.png",
             "gameDescription" to "desc",
             "platform" to "Switch",
@@ -127,6 +130,7 @@ class APIServiceTest {
         `when`(apiRepo.save(any(API::class.java))).thenAnswer { it.arguments[0] }
         val result = service.addGame("gh123", body)
         assertEquals("RPG", result.genre)
+        assertEquals("My Game", result.gameName)
     }
 
     @Test
@@ -135,31 +139,34 @@ class APIServiceTest {
         `when`(apiRepo.save(any(API::class.java))).thenAnswer { it.arguments[0] }
         val result = service.addGame("gh123", body)
         assertEquals("", result.thumbnail)
+        assertEquals("", result.gameName)
         assertEquals(0, result.rating)
     }
 
     @Test
     fun updateGame_fullUpdate() {
-        val game = API("1", "gh123", "t", "d", "p", "g", 5, "old")
+        val game = API("1", "gh123", "Game1", "t", "d", "p", "g", 5, "old")
         `when`(apiRepo.findById("1")).thenReturn(Optional.of(game))
         `when`(apiRepo.save(any(API::class.java))).thenAnswer { it.arguments[0] }
         val body = mapOf("rating" to 9, "comment" to "updated")
         val updated = service.updateGame("gh123", "1", body)
         assertEquals(9, updated.rating)
+        assertEquals("updated", updated.comment)
     }
 
     @Test
     fun updateGame_emptyBody() {
-        val game = API("1", "gh123", "t", "d", "p", "g", 5, "old")
+        val game = API("1", "gh123", "Game1", "t", "d", "p", "g", 5, "old")
         `when`(apiRepo.findById("1")).thenReturn(Optional.of(game))
         `when`(apiRepo.save(any(API::class.java))).thenAnswer { it.arguments[0] }
         val updated = service.updateGame("gh123", "1", emptyMap())
         assertEquals(5, updated.rating)
+        assertEquals("old", updated.comment)
     }
 
     @Test
     fun deleteGame_owned() {
-        val game = API("1", "gh123", "t", "d", "p", "g", 5, "c")
+        val game = API("1", "gh123", "Game1", "t", "d", "p", "g", 5, "c")
         `when`(apiRepo.findById("1")).thenReturn(Optional.of(game))
         service.deleteGame("gh123", "1")
         verify(apiRepo).delete(game)
@@ -167,7 +174,7 @@ class APIServiceTest {
 
     @Test
     fun deleteGame_notOwned() {
-        val game = API("1", "other", "t", "d", "p", "g", 5, "c")
+        val game = API("1", "other", "Game1", "t", "d", "p", "g", 5, "c")
         `when`(apiRepo.findById("1")).thenReturn(Optional.of(game))
         assertThrows(IllegalArgumentException::class.java) {
             service.deleteGame("gh123", "1")
@@ -176,7 +183,7 @@ class APIServiceTest {
 
     @Test
     fun addComment_update() {
-        val game = API("1", "gh123", "t", "d", "p", "g", 5, "old")
+        val game = API("1", "gh123", "Game1", "t", "d", "p", "g", 5, "old")
         `when`(apiRepo.findById("1")).thenReturn(Optional.of(game))
         `when`(apiRepo.save(any(API::class.java))).thenAnswer { it.arguments[0] }
         val updated = service.addComment("gh123", "1", "new")
@@ -185,7 +192,7 @@ class APIServiceTest {
 
     @Test
     fun addComment_notOwned() {
-        val game = API("1", "other", "t", "d", "p", "g", 5, "old")
+        val game = API("1", "other", "Game1", "t", "d", "p", "g", 5, "old")
         `when`(apiRepo.findById("1")).thenReturn(Optional.of(game))
         assertThrows(IllegalArgumentException::class.java) {
             service.addComment("gh123", "1", "new")

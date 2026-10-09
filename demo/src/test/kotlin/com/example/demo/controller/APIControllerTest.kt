@@ -31,7 +31,7 @@ class APIControllerTest {
         val auth = testAuth()
 
         val games = listOf(
-            API("1", "gh123", "t", "d", "p", "g", 5, "c")
+            API("1", "gh123", "Game1", "t", "d", "p", "g", 5, "c")
         )
 
         `when`(apiService.listMyGames("gh123", 0, 20, null, null)).thenReturn(games)
@@ -50,7 +50,7 @@ class APIControllerTest {
         val auth = testAuth()
 
         val games = listOf(
-            API("1", "gh123", "t", "Zelda adventure", "p", "g", 5, "c")
+            API("1", "gh123", "Zelda Adventure", "t", "Zelda adventure", "p", "g", 5, "c")
         )
 
         `when`(apiService.searchMyGames("gh123", "Zelda")).thenReturn(games)
@@ -68,7 +68,7 @@ class APIControllerTest {
         val controller = APIController(apiService)
         val auth = testAuth()
 
-        val game = API("1", "gh123", "t", "d", "p", "g", 5, "c")
+        val game = API("1", "gh123", "Game1", "t", "d", "p", "g", 5, "c")
 
         `when`(apiService.getMyGame("gh123", "1")).thenReturn(game)
 
@@ -85,7 +85,7 @@ class APIControllerTest {
         val auth = testAuth()
 
         val body = mapOf("thumbnail" to "t", "gameDescription" to "d")
-        val saved = API("1", "gh123", "t", "d", "p", "g", 5, "c")
+        val saved = API("1", "gh123", "Game1", "t", "d", "p", "g", 5, "c")
 
         `when`(apiService.addGame("gh123", body)).thenReturn(saved)
 
@@ -102,7 +102,7 @@ class APIControllerTest {
         val auth = testAuth()
 
         val body = mapOf("rating" to 9, "comment" to "updated")
-        val updated = API("1", "gh123", "t", "d", "p", "g", 9, "updated")
+        val updated = API("1", "gh123", "Game1", "t", "d", "p", "g", 9, "updated")
 
         `when`(apiService.updateGame("gh123", "1", body)).thenReturn(updated)
 
@@ -131,7 +131,7 @@ class APIControllerTest {
         val controller = APIController(apiService)
         val auth = testAuth()
 
-        val updated = API("1", "gh123", "t", "d", "p", "g", 5, "new comment")
+        val updated = API("1", "gh123", "Game1", "t", "d", "p", "g", 5, "new comment")
 
         `when`(apiService.addComment("gh123", "1", "new comment")).thenReturn(updated)
 

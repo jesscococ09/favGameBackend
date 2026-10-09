@@ -60,8 +60,8 @@ class UserServiceTest {
     fun `deleteUserAndData deletes API games and user when found`() {
         val user = User("1", "gh123", "Jessika", "icon.png", false)
         val games = listOf(
-            API("g1", "gh123", "t1", "d1", "p1", "g1", 5, "c1"),
-            API("g2", "gh123", "t2", "d2", "p2", "g2", 4, "c2")
+            API("g1", "gh123", "Game1", "t1", "d1", "p1", "g1", 5, "c1"),
+            API("g2", "gh123", "Game2", "t2", "d2", "p2", "g2", 4, "c2")
         )
 
         `when`(userRepo.findByGithubId("gh123")).thenReturn(user)
