@@ -35,5 +35,4 @@ class GithubUserService(private val userRepository: UserRepository) {
             isAdmin = false
         ))
     }
-
 }

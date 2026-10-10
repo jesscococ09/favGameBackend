@@ -27,12 +27,7 @@ recommendedGames {
 data class RecommendedGames(
     @Id
     val id: String,
-    /*
-    if we see which admin added which game
-    val adminGithubId: String?= null,
-    val adminDisplayName: String?= null,
-    val adminIconUrl: String?= null,
-     */
+    val gameName: String,
     val thumbnail:String,
     val gameDescription: String,
     val platform: String,
