@@ -21,6 +21,7 @@ class SecurityConfig(
             .csrf { it.disable() }
             .addFilterBefore(githubFilter, UsernamePasswordAuthenticationFilter::class.java)
             .authorizeHttpRequests {
+                it.requestMatchers("/actuator/health").permitAll()
                 it.requestMatchers("/favGame/v1/admin/**").hasRole("ADMIN")
                 it.anyRequest().authenticated()
             }
