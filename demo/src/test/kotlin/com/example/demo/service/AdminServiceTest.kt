@@ -22,14 +22,16 @@ class AdminServiceTest {
         )
 
         `when`(userRepo.findAll()).thenReturn(users)
+
         val result = service.listUsers()
+
         assertEquals(2, result.size)
         verify(userRepo).findAll()
     }
 
     @Test
     fun `getUser returns user when found`() {
-        val user = User("1", "gh1", "Random", "icon.png", false)
+        val user = User("1", "gh1", "Jessika", "icon.png", false)
 
         `when`(userRepo.findById("1")).thenReturn(java.util.Optional.of(user))
 
@@ -49,8 +51,8 @@ class AdminServiceTest {
     }
 
     @Test
-    fun `updateUser updates admin flag`() {
-        val user = User("1", "gh1", "Random", "icon.png", false)
+    fun `updateUser toggles admin flag`() {
+        val user = User("1", "gh1", "Jessika", "icon.png", false)
 
         `when`(userRepo.findById("1")).thenReturn(java.util.Optional.of(user))
         `when`(userRepo.save(any(User::class.java))).thenAnswer { it.arguments[0] }
@@ -58,31 +60,8 @@ class AdminServiceTest {
         val result = service.updateUser("1", mapOf("isAdmin" to true))
 
         assertTrue(result.isAdmin)
-        verify(userRepo).save(any(User::class.java))
-    }
-
-    @Test
-    fun `updateUser updates displayName`() {
-        val user = User("1", "gh1", "OldName", "icon.png", false)
-
-        `when`(userRepo.findById("1")).thenReturn(java.util.Optional.of(user))
-        `when`(userRepo.save(any(User::class.java))).thenAnswer { it.arguments[0] }
-
-        val result = service.updateUser("1", mapOf("displayName" to "NewName"))
-
-        assertEquals("NewName", result.displayName)
-    }
-
-    @Test
-    fun `updateUser updates iconUrl`() {
-        val user = User("1", "gh1", "Random", "old.png", false)
-
-        `when`(userRepo.findById("1")).thenReturn(java.util.Optional.of(user))
-        `when`(userRepo.save(any(User::class.java))).thenAnswer { it.arguments[0] }
-
-        val result = service.updateUser("1", mapOf("iconUrl" to "new.png"))
-
-        assertEquals("new.png", result.iconUrl)
+        assertEquals("Jessika", result.displayName)
+        assertEquals("icon.png", result.iconUrl)
     }
 
     @Test
@@ -96,7 +75,7 @@ class AdminServiceTest {
 
     @Test
     fun `deleteUserAndData deletes user and their games`() {
-        val user = User("1", "gh1", "Random", "icon.png", false)
+        val user = User("1", "gh1", "Jessika", "icon.png", false)
         val games = listOf(
             API("g1", "gh1", "Game1", "t1", "d1", "p1", "g1", 5, "c1"),
             API("g2", "gh1", "Game2", "t2", "d2", "p2", "g2", 4, "c2")

@@ -16,13 +16,12 @@ class AdminService(
     fun getUser(userId:String): User{
         return userRepository.findById(userId).orElseThrow()
     }
-    fun updateUser(userId: String,body: Map<String, Any>): User{
-        val user= userRepository.findById(userId).orElseThrow()
-        val updated=user.copy(
-            displayName = body["displayName"] as? String ?: user.displayName,
-            iconUrl = body["iconUrl"] as? String ?: user.iconUrl,
+    fun updateUser(userId: String, body: Map<String, Any>): User {
+        val user = userRepository.findById(userId).orElseThrow()
+        val updated = user.copy(
             isAdmin = body["isAdmin"] as? Boolean ?: user.isAdmin
         )
+
         return userRepository.save(updated)
     }
     fun deleteUserAndData(userId: String){

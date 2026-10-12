@@ -33,11 +33,8 @@ class AdminControllerTest {
             User("1", "gh1", "A", "i1", false),
             User("2", "gh2", "B", "i2", true)
         )
-
         `when`(service.listUsers()).thenReturn(users)
-
         val result = controller.listUsers(auth)
-
         assertEquals(2, result.size)
         verify(service).listUsers()
     }
@@ -47,26 +44,20 @@ class AdminControllerTest {
         val service = mock(AdminService::class.java)
         val controller = AdminController(service)
         val auth = adminAuth()
-
-        val user = User("1", "gh1", "Random", "icon.png", false)
-
+        val user = User("1", "gh1", "Jessika", "icon.png", false)
         `when`(service.getUser("1")).thenReturn(user)
-
         val result = controller.getUser(auth, "1")
-
         assertEquals("gh1", result.githubId)
         verify(service).getUser("1")
     }
 
     @Test
-    fun `PATCH updateUser updates fields`() {
+    fun `PATCH updateUser toggles admin flag`() {
         val service = mock(AdminService::class.java)
         val controller = AdminController(service)
         val auth = adminAuth()
-
-        val updated = User("1", "gh1", "Random", "icon.png", true)
+        val updated = User("1", "gh1", "Jessika", "icon.png", true)
         val body = mapOf("isAdmin" to true)
-
         `when`(service.updateUser("1", body)).thenReturn(updated)
         val result = controller.updateUser(auth, "1", body)
         assertEquals(true, result.isAdmin)
