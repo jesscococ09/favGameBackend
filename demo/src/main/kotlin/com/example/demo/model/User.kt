@@ -12,9 +12,17 @@ import jakarta.persistence.Table
 data class User(
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    val id: String?=null,
+    val id: String? = null,
+
+    @Column(name = "githubid")
     val githubId: String,
+
+    @Column(name = "displayname")
     val displayName: String,
-    val iconUrl: String?=null,
-    val isAdmin: Boolean= false
+
+    @Column(name = "iconurl")
+    val iconUrl: String? = null,
+
+    @Column(name = "isadmin")
+    val isAdmin: Boolean = false
 )
