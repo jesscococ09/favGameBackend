@@ -2,13 +2,15 @@ package com.example.demo.controller
 
 import com.example.demo.model.API
 import com.example.demo.model.User
-import com.example.demo.security.GithubUserPrincipal
 import com.example.demo.service.APIService
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import org.mockito.Mockito.*
+import org.mockito.Mockito.mock
+import org.mockito.Mockito.verify
+import org.mockito.Mockito.`when`
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 
 class APIControllerTest {
 
@@ -20,8 +22,11 @@ class APIControllerTest {
             iconUrl = "icon.png",
             isAdmin = false
         )
-        val principal = GithubUserPrincipal(user)
-        return UsernamePasswordAuthenticationToken(principal, "", principal.authorities)
+        return UsernamePasswordAuthenticationToken(
+            user,
+            "",
+            listOf(SimpleGrantedAuthority("ROLE_USER"))
+        )
     }
 
     @Test
@@ -29,18 +34,44 @@ class APIControllerTest {
         val apiService = mock(APIService::class.java)
         val controller = APIController(apiService)
         val auth = testAuth()
-
         val games = listOf(
-            API("1", "gh123", "Game1", "t", "d", "p", "g", 5, "c")
+            API(
+                "1",
+                "gh123",
+                "Game1",
+                "t",
+                "d",
+                "p",
+                "g",
+                5,
+                "c"
+            )
         )
-
-        `when`(apiService.listMyGames("gh123", 0, 20, null, null)).thenReturn(games)
-
-        val result = controller.listMy(auth, 0, 20, null, null)
-
+        `when`(
+            apiService.listMyGames(
+                "gh123",
+                0,
+                20,
+                null,
+                null
+            )
+        ).thenReturn(games)
+        val result = controller.listMy(
+            auth,
+            0,
+            20,
+            null,
+            null
+        )
         assertEquals(1, result.size)
         assertEquals("1", result[0].id)
-        verify(apiService).listMyGames("gh123", 0, 20, null, null)
+        verify(apiService).listMyGames(
+            "gh123",
+            0,
+            20,
+            null,
+            null
+        )
     }
 
     @Test
@@ -48,15 +79,23 @@ class APIControllerTest {
         val apiService = mock(APIService::class.java)
         val controller = APIController(apiService)
         val auth = testAuth()
-
         val games = listOf(
-            API("1", "gh123", "Zelda Adventure", "t", "Zelda adventure", "p", "g", 5, "c")
+            API(
+                "1",
+                "gh123",
+                "Zelda Adventure",
+                "t",
+                "Zelda adventure",
+                "p",
+                "g",
+                5,
+                "c"
+            )
         )
-
-        `when`(apiService.searchMyGames("gh123", "Zelda")).thenReturn(games)
-
+        `when`(
+            apiService.searchMyGames("gh123", "Zelda")
+        ).thenReturn(games)
         val result = controller.searchMyGames(auth, "Zelda")
-
         assertEquals(1, result.size)
         assertEquals("1", result[0].id)
         verify(apiService).searchMyGames("gh123", "Zelda")
@@ -67,13 +106,21 @@ class APIControllerTest {
         val apiService = mock(APIService::class.java)
         val controller = APIController(apiService)
         val auth = testAuth()
-
-        val game = API("1", "gh123", "Game1", "t", "d", "p", "g", 5, "c")
-
-        `when`(apiService.getMyGame("gh123", "1")).thenReturn(game)
-
+        val game = API(
+            "1",
+            "gh123",
+            "Game1",
+            "t",
+            "d",
+            "p",
+            "g",
+            5,
+            "c"
+        )
+        `when`(
+            apiService.getMyGame("gh123", "1")
+        ).thenReturn(game)
         val result = controller.getMyGame(auth, "1")
-
         assertEquals("1", result.id)
         verify(apiService).getMyGame("gh123", "1")
     }
@@ -83,14 +130,25 @@ class APIControllerTest {
         val apiService = mock(APIService::class.java)
         val controller = APIController(apiService)
         val auth = testAuth()
-
-        val body = mapOf("thumbnail" to "t", "gameDescription" to "d")
-        val saved = API("1", "gh123", "Game1", "t", "d", "p", "g", 5, "c")
-
-        `when`(apiService.addGame("gh123", body)).thenReturn(saved)
-
+        val body: Map<String, Any> = mapOf(
+            "thumbnail" to "t",
+            "gameDescription" to "d"
+        )
+        val saved = API(
+            "1",
+            "gh123",
+            "Game1",
+            "t",
+            "d",
+            "p",
+            "g",
+            5,
+            "c"
+        )
+        `when`(
+            apiService.addGame("gh123", body)
+        ).thenReturn(saved)
         val result = controller.addGame(auth, body)
-
         assertEquals("1", result.id)
         verify(apiService).addGame("gh123", body)
     }
@@ -100,8 +158,7 @@ class APIControllerTest {
         val apiService = mock(APIService::class.java)
         val controller = APIController(apiService)
         val auth = testAuth()
-
-        val body = mapOf(
+        val body: Map<String, Any> = mapOf(
             "gameName" to "UpdatedName",
             "thumbnail" to "newThumb.png",
             "gameDescription" to "newDesc",
@@ -110,13 +167,25 @@ class APIControllerTest {
             "rating" to 10,
             "comment" to "Amazing!"
         )
-
-        val updated = API("1", "gh123", "UpdatedName", "newThumb.png", "newDesc", "PC", "Adventure", 10, "Amazing!")
-
-        `when`(apiService.replaceGame("gh123", "1", body)).thenReturn(updated)
-
-        val result = controller.replaceGame(auth, "1", body)
-
+        val updated = API(
+            "1",
+            "gh123",
+            "UpdatedName",
+            "newThumb.png",
+            "newDesc",
+            "PC",
+            "Adventure",
+            10,
+            "Amazing!"
+        )
+        `when`(
+            apiService.replaceGame("gh123", "1", body)
+        ).thenReturn(updated)
+        val result = controller.replaceGame(
+            auth,
+            "1",
+            body
+        )
         assertEquals("UpdatedName", result.gameName)
         assertEquals("newThumb.png", result.thumbnail)
         assertEquals("newDesc", result.gameDescription)
@@ -124,8 +193,11 @@ class APIControllerTest {
         assertEquals("Adventure", result.genre)
         assertEquals(10, result.rating)
         assertEquals("Amazing!", result.comment)
-
-        verify(apiService).replaceGame("gh123", "1", body)
+        verify(apiService).replaceGame(
+            "gh123",
+            "1",
+            body
+        )
     }
 
     @Test
@@ -133,17 +205,36 @@ class APIControllerTest {
         val apiService = mock(APIService::class.java)
         val controller = APIController(apiService)
         val auth = testAuth()
-
-        val body = mapOf("rating" to 9, "comment" to "updated")
-        val updated = API("1", "gh123", "Game1", "t", "d", "p", "g", 9, "updated")
-
-        `when`(apiService.updateGame("gh123", "1", body)).thenReturn(updated)
-
-        val result = controller.updateGame(auth, "1", body)
-
+        val body: Map<String, Any> = mapOf(
+            "rating" to 9,
+            "comment" to "updated"
+        )
+        val updated = API(
+            "1",
+            "gh123",
+            "Game1",
+            "t",
+            "d",
+            "p",
+            "g",
+            9,
+            "updated"
+        )
+        `when`(
+            apiService.updateGame("gh123", "1", body)
+        ).thenReturn(updated)
+        val result = controller.updateGame(
+            auth,
+            "1",
+            body
+        )
         assertEquals(9, result.rating)
         assertEquals("updated", result.comment)
-        verify(apiService).updateGame("gh123", "1", body)
+        verify(apiService).updateGame(
+            "gh123",
+            "1",
+            body
+        )
     }
 
     @Test
@@ -151,9 +242,7 @@ class APIControllerTest {
         val apiService = mock(APIService::class.java)
         val controller = APIController(apiService)
         val auth = testAuth()
-
         val result = controller.deleteGame(auth, "1")
-
         assertEquals("deleted", result["status"])
         verify(apiService).deleteGame("gh123", "1")
     }
@@ -163,14 +252,35 @@ class APIControllerTest {
         val apiService = mock(APIService::class.java)
         val controller = APIController(apiService)
         val auth = testAuth()
-
-        val updated = API("1", "gh123", "Game1", "t", "d", "p", "g", 5, "new comment")
-
-        `when`(apiService.addComment("gh123", "1", "new comment")).thenReturn(updated)
-
-        val result = controller.addComment(auth, "1", mapOf("comment" to "new comment"))
+        val updated = API(
+            "1",
+            "gh123",
+            "Game1",
+            "t",
+            "d",
+            "p",
+            "g",
+            5,
+            "new comment"
+        )
+        `when`(
+            apiService.addComment(
+                "gh123",
+                "1",
+                "new comment"
+            )
+        ).thenReturn(updated)
+        val result = controller.addComment(
+            auth,
+            "1",
+            mapOf("comment" to "new comment")
+        )
 
         assertEquals("new comment", result.comment)
-        verify(apiService).addComment("gh123", "1", "new comment")
+        verify(apiService).addComment(
+            "gh123",
+            "1",
+            "new comment"
+        )
     }
 }

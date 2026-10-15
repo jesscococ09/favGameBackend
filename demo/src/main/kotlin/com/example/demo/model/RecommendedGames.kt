@@ -3,6 +3,7 @@ package com.example.demo.model
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import jakarta.persistence.Column
 
 /* Er diagram as Ref.
 recommendedGames {
@@ -23,17 +24,29 @@ recommendedGames {
  */
 
 @Entity
-@Table(name= "recommendedGames")
+@Table(name="recommendedGames")
 data class RecommendedGames(
     @Id
     val id: String,
-    val gameName: String,
-    val thumbnail:String,
-    val gameDescription: String,
-    val platform: String,
-    val genre: String,
-    val rating: Int,
-    val comment: String
-) {
 
-}
+    @Column(name = "gamename")
+    val gameName: String,
+
+    @Column(name = "thumbnail")
+    val thumbnail: String,
+
+    @Column(name = "gamedescription")
+    val gameDescription: String,
+
+    @Column(name = "platform")
+    val platform: String,
+
+    @Column(name = "genre")
+    val genre: String,
+
+    @Column(name = "rating")
+    val rating: Int,
+
+    @Column(name = "comment")
+    val comment: String
+)

@@ -1,16 +1,17 @@
 package com.example.demo.controller
 
 import com.example.demo.model.User
-import com.example.demo.security.GithubUserPrincipal
 import com.example.demo.service.AdminService
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import org.mockito.Mockito.*
+import org.mockito.Mockito.mock
+import org.mockito.Mockito.verify
+import org.mockito.Mockito.`when`
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 
 class AdminControllerTest {
-
     private fun adminAuth(): Authentication {
         val user = User(
             id = "admin1",
@@ -19,16 +20,18 @@ class AdminControllerTest {
             iconUrl = "icon.png",
             isAdmin = true
         )
-        val principal = GithubUserPrincipal(user)
-        return UsernamePasswordAuthenticationToken(principal, "", principal.authorities)
-    }
 
+        return UsernamePasswordAuthenticationToken(
+            user,
+            "",
+            listOf(SimpleGrantedAuthority("ROLE_ADMIN"))
+        )
+    }
     @Test
     fun `GET listUsers returns all users`() {
         val service = mock(AdminService::class.java)
         val controller = AdminController(service)
         val auth = adminAuth()
-
         val users = listOf(
             User("1", "gh1", "A", "i1", false),
             User("2", "gh2", "B", "i2", true)
@@ -44,7 +47,13 @@ class AdminControllerTest {
         val service = mock(AdminService::class.java)
         val controller = AdminController(service)
         val auth = adminAuth()
-        val user = User("1", "gh1", "Jessika", "icon.png", false)
+        val user = User(
+            id = "1",
+            githubId = "gh1",
+            displayName = "Random",
+            iconUrl = "icon.png",
+            isAdmin = false
+        )
         `when`(service.getUser("1")).thenReturn(user)
         val result = controller.getUser(auth, "1")
         assertEquals("gh1", result.githubId)
@@ -56,8 +65,18 @@ class AdminControllerTest {
         val service = mock(AdminService::class.java)
         val controller = AdminController(service)
         val auth = adminAuth()
-        val updated = User("1", "gh1", "Jessika", "icon.png", true)
-        val body = mapOf("isAdmin" to true)
+
+        val updated = User(
+            id = "1",
+            githubId = "gh1",
+            displayName = "Random",
+            iconUrl = "icon.png",
+            isAdmin = true
+        )
+
+        val body: Map<String, Any> = mapOf(
+            "isAdmin" to true
+        )
         `when`(service.updateUser("1", body)).thenReturn(updated)
         val result = controller.updateUser(auth, "1", body)
         assertEquals(true, result.isAdmin)

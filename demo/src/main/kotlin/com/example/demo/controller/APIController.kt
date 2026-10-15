@@ -1,14 +1,20 @@
 package com.example.demo.controller
 
 import com.example.demo.model.API
-import com.example.demo.security.GithubUserPrincipal
+import com.example.demo.model.User
 import com.example.demo.service.APIService
 import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/favGame/v1/users/games")
-class APIController(private val apiService: APIService) {
+class APIController(
+    private val apiService: APIService
+) {
+
+    private fun currentUser(auth: Authentication): User {
+        return auth.principal as User
+    }
 
     @GetMapping
     fun listMy(
@@ -18,8 +24,16 @@ class APIController(private val apiService: APIService) {
         @RequestParam(required = false) sort: String?,
         @RequestParam(required = false) genre: String?
     ): List<API> {
-        val principal = auth.principal as GithubUserPrincipal
-        return apiService.listMyGames(principal.user.githubId, page, size, sort, genre)
+
+        val user = currentUser(auth)
+
+        return apiService.listMyGames(
+            user.githubId,
+            page,
+            size,
+            sort,
+            genre
+        )
     }
 
     @GetMapping("/search")
@@ -27,8 +41,13 @@ class APIController(private val apiService: APIService) {
         auth: Authentication,
         @RequestParam query: String
     ): List<API> {
-        val principal = auth.principal as GithubUserPrincipal
-        return apiService.searchMyGames(principal.user.githubId, query)
+
+        val user = currentUser(auth)
+
+        return apiService.searchMyGames(
+            user.githubId,
+            query
+        )
     }
 
     @GetMapping("/{id}")
@@ -36,8 +55,13 @@ class APIController(private val apiService: APIService) {
         auth: Authentication,
         @PathVariable id: String
     ): API {
-        val principal = auth.principal as GithubUserPrincipal
-        return apiService.getMyGame(principal.user.githubId, id)
+
+        val user = currentUser(auth)
+
+        return apiService.getMyGame(
+            user.githubId,
+            id
+        )
     }
 
     @PostMapping
@@ -45,8 +69,13 @@ class APIController(private val apiService: APIService) {
         auth: Authentication,
         @RequestBody body: Map<String, Any>
     ): API {
-        val principal = auth.principal as GithubUserPrincipal
-        return apiService.addGame(principal.user.githubId, body)
+
+        val user = currentUser(auth)
+
+        return apiService.addGame(
+            user.githubId,
+            body
+        )
     }
 
     @PutMapping("/{id}")
@@ -55,8 +84,14 @@ class APIController(private val apiService: APIService) {
         @PathVariable id: String,
         @RequestBody body: Map<String, Any>
     ): API {
-        val principal = auth.principal as GithubUserPrincipal
-        return apiService.replaceGame(principal.user.githubId, id, body)
+
+        val user = currentUser(auth)
+
+        return apiService.replaceGame(
+            user.githubId,
+            id,
+            body
+        )
     }
 
     @PatchMapping("/{id}")
@@ -65,8 +100,14 @@ class APIController(private val apiService: APIService) {
         @PathVariable id: String,
         @RequestBody body: Map<String, Any>
     ): API {
-        val principal = auth.principal as GithubUserPrincipal
-        return apiService.updateGame(principal.user.githubId, id, body)
+
+        val user = currentUser(auth)
+
+        return apiService.updateGame(
+            user.githubId,
+            id,
+            body
+        )
     }
 
     @DeleteMapping("/{id}")
@@ -74,9 +115,17 @@ class APIController(private val apiService: APIService) {
         auth: Authentication,
         @PathVariable id: String
     ): Map<String, String> {
-        val principal = auth.principal as GithubUserPrincipal
-        apiService.deleteGame(principal.user.githubId, id)
-        return mapOf("status" to "deleted")
+
+        val user = currentUser(auth)
+
+        apiService.deleteGame(
+            user.githubId,
+            id
+        )
+
+        return mapOf(
+            "status" to "deleted"
+        )
     }
 
     @PostMapping("/{id}/comments")
@@ -85,8 +134,16 @@ class APIController(private val apiService: APIService) {
         @PathVariable id: String,
         @RequestBody body: Map<String, String>
     ): API {
-        val principal = auth.principal as GithubUserPrincipal
-        val comment = body["comment"] ?: throw IllegalArgumentException("requires comment")
-        return apiService.addComment(principal.user.githubId, id, comment)
+
+        val user = currentUser(auth)
+
+        val comment =
+            body["comment"]
+                ?: throw IllegalArgumentException("requires comment")
+        return apiService.addComment(
+            user.githubId,
+            id,
+            comment
+        )
     }
 }
