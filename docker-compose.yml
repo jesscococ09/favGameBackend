@@ -1,0 +1,32 @@
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: favgame
+      POSTGRES_USER: favgame
+      POSTGRES_PASSWORD: favgame
+    ports:
+      - "5432:5432"
+    volumes:
+      - favgame_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U favgame -d favgame"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ./demo
+    ports:
+      - "8080:8080"
+    environment:
+      DATABASE_URL: jdbc:postgresql://db:5432/favgame
+      PORT: 8080
+      APP_VERSION: compose
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  favgame_postgres_data:
