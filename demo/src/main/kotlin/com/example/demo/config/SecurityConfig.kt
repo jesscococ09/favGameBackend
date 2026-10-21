@@ -20,7 +20,13 @@ class SecurityConfig(
         http
             .csrf { it.disable() }
             .authorizeHttpRequests {
-                it.requestMatchers("/actuator/health").permitAll()
+                it.requestMatchers(
+                    "/actuator/health",
+                    "/swagger-ui.html",
+                    "/swagger-ui/**",
+                    "/v3/api-docs/**"
+                ).permitAll()
+
                 it.requestMatchers("/favGame/v1/admin/**").hasRole("ADMIN")
                 it.requestMatchers("/favGame/v1/recommendations/**").authenticated()
                 it.anyRequest().authenticated()
