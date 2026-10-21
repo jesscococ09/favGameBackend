@@ -13,7 +13,10 @@ A REST API built with Kotlin and Spring Boot for the FavGame video game tracker.
 - **Admin recommendations**: administrators can create, update, replace, and delete recommendations
 - **Hosted database**: application data is stored using Supabase PostgreSQL
 - **Docker deployment**: multi-stage Docker build for the Spring Boot backend
+- **Docker Compose**: starts the API and a local PostgreSQL database for development
+- **Integration testing**: REST Assured integration tests run against a real PostgreSQL Testcontainers database
 - **Public API**: backend deployed through Render
+- **Swagger UI**: live API documentation generated from the deployed Spring Boot application
 
 ## Tech Stack
 
@@ -22,22 +25,46 @@ A REST API built with Kotlin and Spring Boot for the FavGame video game tracker.
 - Spring Web
 - Spring Security
 - Spring Data JPA
+- Springdoc OpenAPI / Swagger UI
 - Gradle
 - PostgreSQL
 - Supabase
 - GitHub OAuth
 - Docker
+- Docker Compose
+- Testcontainers
+- REST Assured
 - Render
 - JUnit 5
 - JaCoCo
 
-## API URL
+## Live API and Swagger
 
-Production:
+Production API:
 
 ```text
 https://favgame-backend.onrender.com
 ```
+
+Health check:
+
+```text
+https://favgame-backend.onrender.com/actuator/health
+```
+
+Swagger UI:
+
+```text
+https://favgame-backend.onrender.com/swagger-ui.html
+```
+
+Generated OpenAPI documentation:
+
+```text
+https://favgame-backend.onrender.com/v3/api-docs
+```
+
+The API is deployed on Render over HTTPS. Application endpoints require GitHub authentication, while the health check and API documentation are publicly accessible.
 
 API base path:
 
@@ -61,7 +88,7 @@ API base path:
 
 ```bash
 git clone https://github.com/jesscococ09/favGameBackend.git
-cd favGameBackend
+cd favGameBackend/demo
 ```
 
 2. Configure the required database and authentication environment variables.
@@ -263,7 +290,7 @@ The API documents:
 
 ## Database
 
-FavGame uses Supabase PostgreSQL as the hosted database.
+FavGame uses Supabase PostgreSQL as the hosted production database.
 
 The primary application data consists of:
 
@@ -280,6 +307,12 @@ RecommendedGames
 `RecommendedGames` stores the shared recommendation list.
 
 The Android application does not connect directly to the database. The Android application communicates with the backend API, and the backend performs database operations.
+
+The project uses three separate PostgreSQL environments:
+
+- **Production**: Render backend connects to Supabase PostgreSQL
+- **Local development**: Docker Compose starts a local PostgreSQL database
+- **Integration testing**: Testcontainers starts a temporary PostgreSQL database for the duration of the test run
 
 ## Docker
 
@@ -307,9 +340,10 @@ The first stage uses the JDK and Gradle to build the Spring Boot jar. The second
 
 ## Build Docker Image
 
-Build the backend image:
+From the `demo` directory:
 
 ```bash
+cd demo
 docker build -t favgame-backend .
 ```
 
@@ -319,25 +353,29 @@ Build an amd64 image:
 docker buildx build --platform linux/amd64 -t favgame-backend:amd64 .
 ```
 
-## Run with Docker
-
-Run the backend locally:
-
-```bash
-docker run -p 8080:8080 favgame-backend
-```
-
-The API will be available at:
+The deployed image is hosted in GitHub Container Registry under:
 
 ```text
-http://localhost:8080
+ghcr.io/jesscococ09/favgame-backend
 ```
 
-Database credentials and other secrets should be supplied at runtime rather than stored in the Docker image.
+## Run with Docker
+
+The backend requires database configuration at runtime.
+
+For local development, Docker Compose is the recommended way to start both the API and its local PostgreSQL database.
 
 ## Docker Compose
 
-Start the API and local development database:
+The root-level `docker-compose.yml` starts the backend API and a local PostgreSQL database.
+
+From the repository root:
+
+```bash
+docker compose up --build
+```
+
+Run the services in the background:
 
 ```bash
 docker compose up -d --build
@@ -349,11 +387,35 @@ Stop the services:
 docker compose down
 ```
 
-The local PostgreSQL database is used for development. The deployed backend uses the remote hosted Supabase database.
+Stop the services and delete the local PostgreSQL volume:
+
+```bash
+docker compose down -v
+```
+
+When running with Docker Compose, the local API is available at:
+
+```text
+http://localhost:8080
+```
+
+Local Swagger UI:
+
+```text
+http://localhost:8080/swagger-ui.html
+```
+
+Local generated OpenAPI documentation:
+
+```text
+http://localhost:8080/v3/api-docs
+```
+
+The local PostgreSQL database is used only for development. The deployed backend continues to use the remote Supabase PostgreSQL database.
 
 ## Deployment
 
-The backend is deployed to Render.
+The backend is deployed as a Docker image through Render.
 
 Production URL:
 
@@ -361,14 +423,51 @@ Production URL:
 https://favgame-backend.onrender.com
 ```
 
+Production health check:
+
+```text
+https://favgame-backend.onrender.com/actuator/health
+```
+
+Production Swagger UI:
+
+```text
+https://favgame-backend.onrender.com/swagger-ui.html
+```
+
+Production generated OpenAPI documentation:
+
+```text
+https://favgame-backend.onrender.com/v3/api-docs
+```
+
 The production database runs separately through Supabase rather than inside the application container.
 
 ## Testing
 
-Run unit tests:
+Run all backend tests from the `demo` directory:
 
 ```bash
 ./gradlew test
+```
+
+The backend includes:
+
+- JUnit 5 unit tests
+- REST Assured integration tests
+- PostgreSQL Testcontainers integration testing
+- Service-layer JaCoCo coverage enforcement
+
+The integration tests exercise the API through real HTTP requests and use a temporary PostgreSQL Testcontainers database rather than the production Supabase database.
+
+Integration testing covers:
+
+```text
+Happy path
+400 Bad Request
+401 Unauthorized
+403 Forbidden
+404 Not Found
 ```
 
 Run the full build:
@@ -406,4 +505,22 @@ docs/
 └── proposal.md
 ```
 
-The documentation includes the OpenAPI contract, ER diagram, OAuth2 PKCE authentication sequence, RFC 9457 error model, project proposal, and architecture decision records.
+The documentation includes the handwritten OpenAPI contract, ER diagram, OAuth2 PKCE authentication sequence, RFC 9457 error model, project proposal, and architecture decision records.
+
+The handwritten API contract is located at:
+
+```text
+docs/openapi.yaml
+```
+
+Live documentation generated from the deployed Spring Boot application is available through Swagger UI:
+
+```text
+https://favgame-backend.onrender.com/swagger-ui.html
+```
+
+The runtime-generated OpenAPI document is available at:
+
+```text
+https://favgame-backend.onrender.com/v3/api-docs
+```

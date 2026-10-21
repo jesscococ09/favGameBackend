@@ -30,6 +30,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
 	implementation("org.springframework.security:spring-security-oauth2-core")
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.1.1")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	runtimeOnly("org.postgresql:postgresql")
 	testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
